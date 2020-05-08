@@ -12,8 +12,16 @@ class _InputPageState extends State<InputPage> {
   String _email = '';
   String _password = '';
   String _fecha;
+  List<String> _listaDePoderes = [
+    'Volar',
+    'Caminar Rapido',
+    'Nadar',
+    'Super Peos'
+  ];
+  String _opcionSeleccionada = 'Volar';
 
-  TextEditingController _inputFileFechaEditingController = new TextEditingController();
+  TextEditingController _inputFileFechaEditingController =
+      new TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,6 +38,8 @@ class _InputPageState extends State<InputPage> {
             _crearPassword(),
             Divider(),
             _crearFecha(context),
+            Divider(),
+            _crearDropDown(),
             Divider(),
             _crearPersona(),
           ],
@@ -58,6 +68,38 @@ class _InputPageState extends State<InputPage> {
           _crearNombre = data;
         });
       },
+    );
+  }
+
+  List<DropdownMenuItem<String>> _getOpcionesDropDown() {
+    List<DropdownMenuItem<String>> lista = new List();
+
+    _listaDePoderes.forEach((poder) {
+      lista.add(DropdownMenuItem(
+        child: Text(poder),
+        value: poder,
+      ));
+    });
+
+    return lista;
+  }
+
+  Widget _crearDropDown() {
+    return Row(
+      children: <Widget>[
+        Icon(Icons.select_all),
+        SizedBox(width: 30.0),
+        Expanded(
+          child: DropdownButton(
+              value: _opcionSeleccionada,
+              items: _getOpcionesDropDown(),
+              onChanged: (opcion) {
+                setState(() {
+                  _opcionSeleccionada = opcion;
+                });
+              }),
+        )
+      ],
     );
   }
 
@@ -103,6 +145,22 @@ class _InputPageState extends State<InputPage> {
     );
   }
 
+  Widget _crearPersona() {
+    return Column(
+      children: <Widget>[
+        ListTile(
+          title: Text("el nombre es  $_crearNombre"),
+          subtitle: Text("el correo es $_email y la contraseña es $_password"),
+          leading: Text(_opcionSeleccionada),
+        ),
+        Divider(),
+        // ListTile(
+        //   title: Text("el password es $_password"),
+        // ),
+      ],
+    );
+  }
+
   Widget _crearFecha(BuildContext context) {
     return TextField(
       controller: _inputFileFechaEditingController,
@@ -117,42 +175,26 @@ class _InputPageState extends State<InputPage> {
           suffixIcon: Icon(Icons.calendar_today), // a la derecha sobre el input
           icon: Icon(Icons.calendar_today) // a la quierda a un lado del input
           ),
-      onTap: (){
-        FocusScope.of(context).requestFocus( new FocusNode());
+      onTap: () {
+        FocusScope.of(context).requestFocus(new FocusNode());
         _selectDay(context);
-              },
-            );
-          }
-        
-          Widget _crearPersona() {
-            return Column(
-              children: <Widget>[
-                ListTile(
-                  title: Text("el nombre es  $_crearNombre"),
-                  subtitle: Text("el correo es $_email y la contraseña es $_password"),
-                ),
-                Divider(),
-                // ListTile(
-                //   title: Text("el password es $_password"),
-                // ),
-              ],
-            );
-          }
-        
-          void _selectDay(BuildContext context) async{
-            DateTime picket = await showDatePicker(
-              context: context,
-              lastDate: new DateTime(2025),
-              initialDate: new DateTime.now(),
-              firstDate: new DateTime(2020),
-              
+      },
+    );
+  }
 
-            );
-            if(picket != null){
-               setState(() {
-                 _fecha = picket.toString();
-                 _inputFileFechaEditingController.text = _fecha;
-               }); 
-              }
-          }
+  void _selectDay(BuildContext context) async {
+    DateTime picket = await showDatePicker(
+      context: context,
+      lastDate: new DateTime(2025),
+      initialDate: new DateTime.now(),
+      firstDate: new DateTime(2020),
+      //locale: Locale('es', 'Es')
+    );
+    if (picket != null) {
+      setState(() {
+        _fecha = picket.toString();
+        _inputFileFechaEditingController.text = _fecha;
+      });
+    }
+  }
 }
